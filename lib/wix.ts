@@ -5,8 +5,8 @@ import { collections, items } from '@wix/data';
 const wix = createClient({
 	modules: { collections, items },
 	auth: ApiKeyStrategy({
-		apiKey: process.env.WIX_API_KEY,
-		siteId: process.env.WIX_SITE_ID,
+		apiKey: process.env.WIX_API_KEY!,
+		siteId: process.env.WIX_SITE_ID!,
 	}),
 });
 
@@ -24,6 +24,7 @@ export const getTestimonials = async (): Promise<
 				offset: 0,
 			},
 		});
+		if (!data.results) return [];
 		const testimonials = data.results.map((item: any) => {
 			return {
 				_id: item._id,
