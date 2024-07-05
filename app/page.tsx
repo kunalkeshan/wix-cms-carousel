@@ -9,3 +9,6 @@ export default async function Home() {
 		</main>
 	);
 }
+
+const SIX_HOURS_IN_MS = 6 * 60 * 60 * 1000;
+export const revalidate = SIX_HOURS_IN_MS;
