@@ -7,4 +7,5 @@ interface Testimonial {
 	title: string;
 	testimonial: string;
 	videoUrl: string;
+	designation: string;
 }

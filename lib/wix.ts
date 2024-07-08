@@ -1,6 +1,6 @@
 // @ts-ignore
-import { createClient, ApiKeyStrategy, media } from '@wix/sdk';
-import { collections, items } from '@wix/data';
+import { createClient, ApiKeyStrategy, media } from "@wix/sdk";
+import { collections, items } from "@wix/data";
 
 const wix = createClient({
 	modules: { collections, items },
@@ -17,7 +17,7 @@ export const getTestimonials = async (): Promise<
 > => {
 	try {
 		const data = await wix.items.aggregateDataItems({
-			dataCollectionId: 'Testimonials',
+			dataCollectionId: "Testimonials",
 			consistentRead: true,
 			paging: {
 				limit: 1000,
@@ -35,6 +35,7 @@ export const getTestimonials = async (): Promise<
 				title: item.title,
 				testimonial: item.testimonial,
 				videoUrl: media.getVideoUrl(item.video).url,
+				designation: item.designation,
 			};
 		});
 		return testimonials;
