@@ -8,8 +8,9 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
 import { StarIcon } from 'lucide-react';
+
+// import Autoplay from 'embla-carousel-autoplay';
 
 interface Props
 	extends React.HTMLAttributes<React.ComponentPropsWithoutRef<'div'>> {
@@ -17,22 +18,22 @@ interface Props
 }
 
 const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
-	// console.log(testimonials);
 	return (
 		<section className='p-6'>
 			<Carousel
-			// plugins={[
-			// 	Autoplay({
-			// 		delay: 2000,
-			// 	}),
-			// ]}
+				// plugins={[
+				// 	Autoplay({
+				// 		delay: 2000,
+				// 	}),
+				// ]}
+				className='relative'
 			>
 				<CarouselContent>
 					{testimonials
 						.concat(new Array(10).fill(testimonials[0]))
-						.map((testimonial) => (
+						.map((testimonial, idx) => (
 							<CarouselItem
-								key={testimonial._id}
+								key={`${testimonial._id}-${idx}`}
 								className='md:basis-1/2 lg:basis-1/4 h-full'
 							>
 								<div className='text-black relative'>
@@ -41,10 +42,10 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 										width='100%'
 										height='570'
 										controls
-										preload='none'
+										preload='metadata'
 									>
 										<source
-											src={testimonial.videoUrl}
+											src={`${testimonial.videoUrl}#t=0.5`}
 											type='video/mp4'
 										/>
 									</video>
@@ -52,9 +53,11 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 										<div className='flex gap-2 items-center'>
 											{Array(testimonial.rating)
 												.fill(0)
-												.map((star) => {
+												.map((_, starIdx) => {
 													return (
-														<span key={star}>
+														<span
+															key={`${testimonial._id}-${idx}-star-${starIdx}`}
+														>
 															<StarIcon
 																fill='#facc15'
 																className='text-yellow-400'
@@ -85,6 +88,8 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 							</CarouselItem>
 						))}
 				</CarouselContent>
+				<CarouselPrevious className='left-0' />
+				<CarouselNext className='right-0' />
 			</Carousel>
 		</section>
 	);
