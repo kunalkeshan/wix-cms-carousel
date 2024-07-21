@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Pause } from 'lucide-react';
+import { usePauseAllVideos } from '@/hooks/use-pause-all-videos';
 
 interface Props extends React.VideoHTMLAttributes<HTMLVideoElement> {
 	videoUrl: string;
@@ -20,6 +21,48 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 			setPlaying(false);
 		}
 	};
+
+	// Pause all other videos when this video is playing
+	usePauseAllVideos(videoRef.current);
+
+	// Update playing and listening states on this video
+	// when other video tags are playing or paused
+	// control flow comes from the above hook - usePauseAllVideos
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video) return;
+
+		video.addEventListener('ended', () => {
+			setPlaying(false);
+		});
+
+		video.addEventListener('play', () => {
+			setPlaying(true);
+		});
+
+		video.addEventListener('playing', () => {
+			setPlaying(true);
+		});
+
+		video.addEventListener('pause', () => {
+			setPlaying(false);
+		});
+
+		return () => {
+			video.removeEventListener('ended', () => {
+				setPlaying(false);
+			});
+			video.removeEventListener('play', () => {
+				setPlaying(true);
+			});
+			video.removeEventListener('playing', () => {
+				setPlaying(true);
+			});
+			video.removeEventListener('pause', () => {
+				setPlaying(false);
+			});
+		};
+	}, [videoRef]);
 
 	return (
 		<div className='relative aspect-[9_/_16] rounded-t-lg overflow-hidden bg-gradient-to-b from-transparent to-black'>

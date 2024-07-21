@@ -23,8 +23,8 @@ const MAX_RATING = 5;
 
 const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 	return (
-		<section className='p-6'>
-			<Carousel>
+		<section className='p-6 bg-transparent'>
+			<Carousel className='bg-transparent'>
 				<CarouselContent className='items-stretch'>
 					{testimonials
 						.concat(new Array(10).fill(testimonials[0]))

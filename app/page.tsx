@@ -4,7 +4,7 @@ import { getTestimonials } from '@/lib/wix';
 export default async function Home() {
 	const testimonials = await getTestimonials();
 	return (
-		<main>
+		<main className='bg-transparent'>
 			<TestimonialsCarousel testimonials={testimonials} />
 		</main>
 	);
