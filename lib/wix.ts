@@ -1,6 +1,6 @@
 // @ts-ignore
-import { createClient, ApiKeyStrategy, media } from "@wix/sdk";
-import { collections, items } from "@wix/data";
+import { createClient, ApiKeyStrategy, media } from '@wix/sdk';
+import { collections, items } from '@wix/data';
 
 const wix = createClient({
 	modules: { collections, items },
@@ -16,16 +16,25 @@ export const getTestimonials = async (): Promise<
 	ReadonlyArray<Testimonial>
 > => {
 	try {
-		const data = await wix.items.aggregateDataItems({
-			dataCollectionId: "Testimonials",
-			consistentRead: true,
-			paging: {
-				limit: 1000,
-				offset: 0,
-			},
-		});
-		if (!data.results) return [];
-		const testimonials = data.results.map((item: any) => {
+		const data = await wix.items
+			.queryDataItems({
+				dataCollectionId: 'Testimonials',
+				consistentRead: true,
+			})
+			.limit(1000)
+			.find();
+		if (!data.items) return [];
+		// const data = await wix.items.aggregateDataItems({
+		// 	dataCollectionId: 'Testimonials',
+		// 	consistentRead: true,
+		// 	paging: {
+		// 		limit: 1000,
+		// 		offset: 0,
+		// 	},
+		// });
+		// if (!data.results) return [];
+		const testimonials = data.items.map((testimonial: any) => {
+			const item = testimonial.data;
 			return {
 				_id: item._id,
 				createdAt: new Date(item._createdDate.$date),
