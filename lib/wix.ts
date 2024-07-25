@@ -21,6 +21,7 @@ export const getTestimonials = async (): Promise<
 				dataCollectionId: 'Testimonials',
 				consistentRead: true,
 			})
+			.ascending('order')
 			.limit(1000)
 			.find();
 		if (!data.items) return [];
