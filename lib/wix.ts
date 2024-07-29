@@ -18,7 +18,7 @@ export const getTestimonials = async (): Promise<
 	try {
 		const data = await wix.items
 			.queryDataItems({
-				dataCollectionId: 'Testimonials',
+				dataCollectionId: process.env.WIX_COLLECTION_ID!,
 				consistentRead: true,
 			})
 			.ascending('order')
@@ -40,7 +40,7 @@ export const getTestimonials = async (): Promise<
 				_id: item._id,
 				createdAt: new Date(item._createdDate.$date),
 				updatedAt: new Date(item._updatedDate.$date),
-				date: new Date(item.date),
+				date: new Date(item.date.$date),
 				rating: item.rating,
 				title: item.title,
 				testimonial: item.testimonial,
