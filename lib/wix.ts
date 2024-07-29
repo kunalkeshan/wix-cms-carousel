@@ -22,7 +22,7 @@ export const getTestimonials = async (): Promise<
 				consistentRead: true,
 			})
 			.ascending('order')
-			.limit(1000)
+			.limit(999)
 			.find();
 		if (!data.items) return [];
 		// const data = await wix.items.aggregateDataItems({
