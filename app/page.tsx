@@ -10,5 +10,5 @@ export default async function Home() {
 	);
 }
 
-const TEN_MINS_IN_MS = 10 * 60 * 1000;
-export const revalidate = TEN_MINS_IN_MS;
+const TEN_MINS_IN_SECONDS = 10 * 60;
+export const revalidate = TEN_MINS_IN_SECONDS;
