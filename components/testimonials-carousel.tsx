@@ -76,7 +76,7 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 								</div>
 							</div>
 							<div className='p-4 bg-white rounded-b-lg flex-1'>
-								<p className='text-sm text-justify'>
+								<p className='text-sm'>
 									&ldquo;{testimonial.testimonial}&rdquo;
 								</p>
 								<time
