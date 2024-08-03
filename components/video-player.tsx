@@ -65,7 +65,14 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 	}, [videoRef]);
 
 	return (
-		<div className='relative aspect-[9_/_16] rounded-t-lg overflow-hidden bg-gradient-to-b from-transparent to-black'>
+		<div
+			role='button'
+			className='relative aspect-[9_/_16] rounded-t-lg overflow-hidden bg-gradient-to-b from-transparent to-black'
+			onClick={() => {
+				const control = playing ? 'pause' : 'play';
+				handleTogglePlay(control);
+			}}
+		>
 			<video
 				ref={videoRef}
 				{...props}
@@ -76,15 +83,9 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 				preload='metadata'
 				playsInline
 			>
-				<source src={`${videoUrl}#t=0.5`} type='video/mp4' />
+				<source src={`${videoUrl}#t=0.1`} type='video/mp4' />
 			</video>
-			<button
-				onClick={() => {
-					const control = playing ? 'pause' : 'play';
-					handleTogglePlay(control);
-				}}
-				className='h-fit absolute bottom-4 right-4 p-1 rounded-md hover:bg-white/40 transition-all duration-300'
-			>
+			<div className='h-fit absolute bottom-4 right-4 p-1 rounded-md hover:bg-white/40 transition-all duration-300'>
 				{playing ? (
 					<Pause
 						size={20}
@@ -100,7 +101,7 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 						className='shrink-0'
 					/>
 				)}
-			</button>
+			</div>
 		</div>
 	);
 };
