@@ -67,7 +67,22 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 									</div>
 									<div className='text-white pt-2'>
 										<h1 className='text-sm'>
-											{testimonial.title}
+											{testimonial.title
+												.split('|')
+												.map((item, idx) => (
+													<React.Fragment
+														key={`testimonial-title-${testimonial._id}-${idx}`}
+													>
+														<span className='select-all'>
+															{item}
+														</span>
+														{idx !==
+															testimonial.title.split(
+																'|'
+															).length -
+																1 && ' | '}
+													</React.Fragment>
+												))}
 										</h1>
 										<h2 className='text-xs text-slate-300'>
 											{testimonial.designation}
@@ -76,7 +91,7 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 								</div>
 							</div>
 							<div className='p-4 bg-white rounded-b-lg flex-1'>
-								<p className='text-sm'>
+								<p className='text-sm select-all'>
 									&ldquo;{testimonial.testimonial}&rdquo;
 								</p>
 								<time
