@@ -84,7 +84,7 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 													</React.Fragment>
 												))}
 										</h1>
-										<h2 className='text-xs text-slate-300'>
+										<h2 className='text-xs text-white'>
 											{testimonial.designation}
 										</h2>
 									</div>
