@@ -29,7 +29,7 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 					{testimonials.map((testimonial, idx) => (
 						<CarouselItem
 							key={`${testimonial._id}-${idx}`}
-							className='md:basis-1/2 lg:basis-1/4 min-h-full rounded-lg overflow-hidden'
+							className='md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden'
 						>
 							<div className='text-black relative'>
 								<VideoPlayer videoUrl={testimonial.videoUrl} />
