@@ -83,7 +83,7 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 				preload='metadata'
 				playsInline
 			>
-				<source src={`${videoUrl}#t=0`} type='video/mp4' />
+				<source src={`${videoUrl}#t=0.001`} type='video/mp4' />
 			</video>
 			<div className='h-fit absolute bottom-4 right-4 p-1 rounded-md hover:bg-white/40 transition-all duration-300'>
 				{playing ? (
