@@ -45,6 +45,8 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 														<StarIcon
 															fill='#facc15'
 															className='text-yellow-400'
+															stroke='#000000'
+															strokeWidth={1}
 															size={12}
 														/>
 													</span>
@@ -66,7 +68,7 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 											})}
 									</div>
 									{/* Refer to Globals CSS for more information on the "text-outline" class. */}
-									<div className='text-white pt-2 text-outline'>
+									<div className='text-white pt-2 text-outline max-w-[90%]'>
 										<h1 className='text-sm'>
 											{testimonial.title
 												.split('|')
