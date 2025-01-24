@@ -65,7 +65,8 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 												);
 											})}
 									</div>
-									<div className='text-white pt-2'>
+									{/* Refer to Globals CSS for more information on the "text-outline" class. */}
+									<div className='text-white pt-2 text-outline'>
 										<h1 className='text-sm'>
 											{testimonial.title
 												.split('|')
