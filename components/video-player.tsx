@@ -85,17 +85,17 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 			>
 				<source src={`${videoUrl}#t=0.001`} type='video/mp4' />
 			</video>
-			<div className='h-fit absolute bottom-4 right-4 p-1 rounded-md hover:bg-white/40 transition-all duration-300'>
+			<div className='h-fit absolute bottom-4 right-4 p-1 rounded-md bg-white/40 transition-all duration-300'>
 				{playing ? (
 					<Pause
-						size={20}
+						size={32}
 						fill='#ffffff'
 						stroke='#ffffff'
 						className='shrink-0'
 					/>
 				) : (
 					<Play
-						size={20}
+						size={32}
 						fill='#ffffff'
 						stroke='#ffffff'
 						className='shrink-0'
