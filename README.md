@@ -15,6 +15,16 @@ After embedding the site, adjust the width and height of the embed to fit your p
 
 ![Steps to Embed Site Into Wix](https://github.com/kunalkeshan/wix-cms-carousel/assets/68579547/508727bb-cfbf-4f51-ae08-8c96b0344461)
 
+## Using URL Search Query for Filtering Videos
+
+1. Make sure the key in the wix collection for the tags field matches to that of the query params. I'm using `tags`, but the saved field was stored as `arraystring` by Wix. (Map it out correctly)
+2. Update the types for the tags as per requirement.
+3. Just add `/?tags=<tag1>,<tag2>` and so on, and it will filter it out.
+4. Filtering logic is as follows
+    - No `tags` or empty `tags` query will return all the testimonial videos.
+    - Filtering will compare with tags passed in the query to the tags in the video object, will return all those that matches.
+    - Ordering of tag is independing of the order of the videos, meaning `/?tags=<tag1>,<tag2>` or `/?tags=<tag2>,<tag1>` will return the same results.
+
 ## References
 
 - [Create a Client with an API Key](https://dev.wix.com/docs/go-headless/coding/java-script-sdk/admin/create-a-client-with-an-api-key)
@@ -22,4 +32,4 @@ After embedding the site, adjust the width and height of the embed to fit your p
 - [Getting Media URLs](https://dev.wix.com/docs/sdk/articles/working-with-the-sdk/work-with-wix-media)
 - [aggregateDataItems( ) - fetching CMS Data Items from a collection](https://dev.wix.com/docs/sdk/backend-modules/data/items/aggregate-data-items)
 - [Preload Video Poster from video frame at custom timeframe](https://stackoverflow.com/questions/7323053/dynamically-using-the-first-frame-as-poster-in-html5-video)
-  
+- [Nuqs for Search Query Access](https://nuqs.47ng.com/docs/)
