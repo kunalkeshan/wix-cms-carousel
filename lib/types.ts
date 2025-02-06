@@ -8,4 +8,7 @@ interface Testimonial {
 	testimonial: string;
 	videoUrl: string;
 	designation: string;
+	tags?: TestimonialTags[];
 }
+
+type TestimonialTags = 'coliving' | 'independent' | 'retreats';

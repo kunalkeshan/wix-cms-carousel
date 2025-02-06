@@ -1,6 +1,6 @@
 'use client';
-import React from 'react';
 
+import React from 'react';
 import {
 	Carousel,
 	CarouselContent,
@@ -11,6 +11,7 @@ import {
 import { StarIcon } from 'lucide-react';
 import VideoPlayer from './video-player';
 import { dateFormatter } from '@/lib/utils';
+import { parseAsArrayOf, parseAsStringEnum, useQueryState } from 'nuqs';
 
 // import Autoplay from 'embla-carousel-autoplay';
 
@@ -22,6 +23,17 @@ interface Props
 const MAX_RATING = 5;
 
 const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
+	const [tags] = useQueryState(
+		'tags',
+		parseAsArrayOf(
+			parseAsStringEnum<TestimonialTags>([
+				'coliving',
+				'independent',
+				'retreats',
+			])
+		)
+	);
+
 	return (
 		<section className='p-4 bg-transparent'>
 			<Carousel className='bg-transparent'>
