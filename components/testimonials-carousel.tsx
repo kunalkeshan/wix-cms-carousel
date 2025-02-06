@@ -40,7 +40,7 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 				<CarouselContent className='items-stretch'>
 					{testimonials
 						.filter((testimonial) =>
-							tags && tags.length === 0
+							tags === null || (tags && tags.length === 0)
 								? true
 								: tags &&
 								  tags.some((tag) =>

@@ -46,6 +46,7 @@ export const getTestimonials = cache(
 					testimonial: item.testimonial,
 					videoUrl: media.getVideoUrl(item.video).url,
 					designation: item.designation,
+					tags: item?.arraystring ?? [],
 				};
 			});
 			return testimonials;
