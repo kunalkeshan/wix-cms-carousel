@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import TestimonialsCarousel from '@/components/testimonials-carousel';
 import { getTestimonials } from '@/lib/wix';
 
@@ -5,7 +6,9 @@ export default async function Home() {
 	const testimonials = await getTestimonials();
 	return (
 		<main className='bg-transparent'>
-			<TestimonialsCarousel testimonials={testimonials} />
+			<Suspense fallback={<div>Loading...</div>}>
+				<TestimonialsCarousel testimonials={testimonials} />
+			</Suspense>
 		</main>
 	);
 }
