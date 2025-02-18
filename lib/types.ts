@@ -11,4 +11,4 @@ interface Testimonial {
 	tags?: TestimonialTags[];
 }
 
-type TestimonialTags = 'coliving' | 'independent' | 'retreats';
+type TestimonialTags = 'coliving' | 'independent' | 'retreats' | 'volunteering';

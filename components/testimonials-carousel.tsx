@@ -30,6 +30,7 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 				'coliving',
 				'independent',
 				'retreats',
+				'volunteering',
 			])
 		)
 	);
