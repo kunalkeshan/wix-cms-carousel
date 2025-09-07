@@ -13,6 +13,7 @@ import VideoPlayer from './video-player';
 import { dateFormatter } from '@/lib/utils';
 import { useTestimonials } from '@/hooks/use-testimonials';
 import TestimonialSkeleton from './testimonial-skeleton';
+import ErrorTestimonial from './error-testimonial';
 import { type CarouselApi } from '@/components/ui/carousel';
 
 // import Autoplay from 'embla-carousel-autoplay';
@@ -27,10 +28,10 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 		data, 
 		isLoading, 
 		isError, 
-		error, 
 		fetchNextPage, 
 		hasNextPage, 
-		isFetchingNextPage 
+		isFetchingNextPage,
+		refetch 
 	} = useTestimonials();
 
 	const [api, setApi] = React.useState<CarouselApi>();
@@ -138,10 +139,20 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 			<section className='p-4 bg-transparent'>
 				<div className='bg-transparent'>
 					<div className='items-stretch flex gap-4 overflow-hidden'>
-						{Array.from({ length: 5 }).map((_, idx) => (
+						{/* Show 1 skeleton on mobile, multiple on larger screens */}
+						{Array.from({ length: 1 }).map((_, idx) => (
 							<div
 								key={idx}
-								className='md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden flex-shrink-0'
+								className='basis-full md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden flex-shrink-0'
+							>
+								<TestimonialSkeleton />
+							</div>
+						))}
+						{/* Additional skeletons for larger screens only */}
+						{Array.from({ length: 4 }).map((_, idx) => (
+							<div
+								key={`desktop-${idx}`}
+								className='hidden md:block md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden flex-shrink-0'
 							>
 								<TestimonialSkeleton />
 							</div>
@@ -154,9 +165,9 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 
 	if (isError) {
 		return (
-			<section className='p-4 bg-transparent'>
-				<div className='text-center text-red-500'>
-					Error loading testimonials: {error?.message}
+			<section className='p-4 bg-transparent flex justify-center'>
+				<div className='max-w-sm'>
+					<ErrorTestimonial onRetry={() => refetch()} />
 				</div>
 			</section>
 		);
