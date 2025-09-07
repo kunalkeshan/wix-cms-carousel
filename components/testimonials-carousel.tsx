@@ -37,10 +37,23 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 	const [currentSlide, setCurrentSlide] = React.useState(0);
 	const currentSlideRef = useRef(0);
 	const isLoadingRef = useRef(false);
-	const loadThreshold = 3; // Load more when within 3 slides of the end
+	const [showLoadingSkeleton, setShowLoadingSkeleton] = React.useState(false);
+	const loadThreshold = 3; // Load more when within 3 slides of the end (since we have 5 per page)
 	const previousLengthRef = useRef(0);
 
 	const allTestimonials = data?.pages.flatMap(page => page.testimonials) || [];
+	
+	// Keep current values in refs to avoid stale closures
+	const hasNextPageRef = useRef(hasNextPage);
+	const isFetchingNextPageRef = useRef(isFetchingNextPage);
+	const fetchNextPageRef = useRef(fetchNextPage);
+	const allTestimonialsLengthRef = useRef(allTestimonials.length);
+
+	// Update refs when values change
+	hasNextPageRef.current = hasNextPage;
+	isFetchingNextPageRef.current = isFetchingNextPage;
+	fetchNextPageRef.current = fetchNextPage;
+	allTestimonialsLengthRef.current = allTestimonials.length;
 
 	// Initialize carousel API and set up event listeners (stable, no dependencies on data)
 	useEffect(() => {
@@ -54,16 +67,18 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 			currentSlideRef.current = current;
 
 			// Check if we're near the end and need to load more
-			const totalSlides = allTestimonials.length;
+			const totalSlides = allTestimonialsLengthRef.current;
 			const shouldLoadMore = 
-				hasNextPage && 
-				!isFetchingNextPage && 
+				hasNextPageRef.current && 
+				!isFetchingNextPageRef.current && 
 				!isLoadingRef.current &&
 				current >= totalSlides - loadThreshold;
 
+
 			if (shouldLoadMore) {
 				isLoadingRef.current = true;
-				fetchNextPage();
+				setShowLoadingSkeleton(true); // Show skeleton only when user navigates to trigger loading
+				fetchNextPageRef.current();
 			}
 		};
 
@@ -76,7 +91,7 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 		return () => {
 			api.off('select', onSelect);
 		};
-	}, [api]); // Only depend on api, not on data
+	}, [api]); // Only depend on api since we use refs for other values
 
 	// Separate effect to handle data changes and position preservation
 	useEffect(() => {
@@ -89,6 +104,9 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 		if (hasNewData && hadPreviousData && !isFetchingNextPage) {
 			// Data just finished loading, restore position immediately
 			const preservedPosition = currentSlideRef.current;
+			
+			// Reinitialize carousel to recognize new slides
+			api.reInit();
 			
 			// Use multiple restoration attempts to ensure it sticks
 			const restore = () => {
@@ -107,6 +125,7 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 			
 			// Reset loading state
 			isLoadingRef.current = false;
+			setShowLoadingSkeleton(false);
 		}
 		
 		// Update previous length
@@ -231,7 +250,7 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 								</div>
 							</CarouselItem>
 						))}
-					{isFetchingNextPage && (
+					{showLoadingSkeleton && hasNextPage && (
 						Array.from({ length: 2 }).map((_, idx) => (
 							<CarouselItem 
 								key={`loading-${idx}`} 

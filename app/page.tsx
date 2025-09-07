@@ -9,7 +9,7 @@ function getBaseUrl() {
 	return 'http://localhost:3000';
 }
 
-async function getTestimonials(limit = 10, offset = 0, tags = '') {
+async function getTestimonials(limit = 5, offset = 0, tags = '') {
 	const baseUrl = getBaseUrl();
 	const searchParams = new URLSearchParams({
 		limit: limit.toString(),
@@ -30,7 +30,7 @@ async function getTestimonials(limit = 10, offset = 0, tags = '') {
 
 export default async function Home() {
 	const queryClient = new QueryClient();
-	const limit = 10;
+	const limit = 5;
 
 	await queryClient.prefetchInfiniteQuery({
 		queryKey: ['testimonials', { tags: '', limit }],

@@ -14,7 +14,7 @@ function getBaseUrl() {
 }
 
 async function fetchTestimonials({
-	limit = 10,
+	limit = 5,
 	offset = 0,
 	tags = '',
 }: {
@@ -38,7 +38,7 @@ async function fetchTestimonials({
 	return response.json();
 }
 
-export function useTestimonials(limit = 10) {
+export function useTestimonials(limit = 5) {
 	const [tags] = useQueryState(
 		'tags',
 		parseAsArrayOf(
