@@ -32,7 +32,7 @@ const ErrorTestimonial: React.FC<ErrorTestimonialProps> = ({ onRetry }) => {
 			{/* Error content */}
 			<div className='p-2 sm:p-4 bg-white rounded-b-lg flex-1'>
 				<p className='text-xs sm:text-sm text-gray-500 text-center'>
-					&ldquo;We're working to resolve this issue. Thank you for your patience.&rdquo;
+					&ldquo;We&rsquo;re working to resolve this issue. Thank you for your patience.&rdquo;
 				</p>
 				<div className='text-xs text-gray-400 text-center mt-2'>
 					Technical Support
