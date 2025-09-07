@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Pause } from 'lucide-react';
 import { usePauseAllVideos } from '@/hooks/use-pause-all-videos';
@@ -10,6 +10,8 @@ interface Props extends React.VideoHTMLAttributes<HTMLVideoElement> {
 const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [playing, setPlaying] = useState(false);
+	const [isInView, setIsInView] = useState(false);
+	const [hasLoadedMetadata, setHasLoadedMetadata] = useState(false);
 
 	const handleTogglePlay = (control: 'play' | 'pause') => {
 		if (!videoRef.current) return;
@@ -22,6 +24,38 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 		}
 	};
 
+	// Intersection Observer for lazy loading
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						setIsInView(true);
+						if (!hasLoadedMetadata && video.preload === 'none') {
+							video.preload = 'metadata';
+							setHasLoadedMetadata(true);
+						}
+					} else {
+						setIsInView(false);
+					}
+				});
+			},
+			{
+				threshold: 0.1, // Trigger when 10% of video is visible
+				rootMargin: '100px', // Start loading 100px before entering viewport
+			}
+		);
+
+		observer.observe(video);
+
+		return () => {
+			observer.unobserve(video);
+		};
+	}, [hasLoadedMetadata]);
+
 	// Pause all other videos when this video is playing
 	usePauseAllVideos(videoRef.current);
 
@@ -32,37 +66,26 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 		const video = videoRef.current;
 		if (!video) return;
 
-		video.addEventListener('ended', () => {
-			setPlaying(false);
-		});
+		const handleEnded = () => setPlaying(false);
+		const handlePlay = () => setPlaying(true);
+		const handlePlaying = () => setPlaying(true);
+		const handlePause = () => setPlaying(false);
+		const handleLoadedMetadata = () => setHasLoadedMetadata(true);
 
-		video.addEventListener('play', () => {
-			setPlaying(true);
-		});
-
-		video.addEventListener('playing', () => {
-			setPlaying(true);
-		});
-
-		video.addEventListener('pause', () => {
-			setPlaying(false);
-		});
+		video.addEventListener('ended', handleEnded);
+		video.addEventListener('play', handlePlay);
+		video.addEventListener('playing', handlePlaying);
+		video.addEventListener('pause', handlePause);
+		video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
 		return () => {
-			video.removeEventListener('ended', () => {
-				setPlaying(false);
-			});
-			video.removeEventListener('play', () => {
-				setPlaying(true);
-			});
-			video.removeEventListener('playing', () => {
-				setPlaying(true);
-			});
-			video.removeEventListener('pause', () => {
-				setPlaying(false);
-			});
+			video.removeEventListener('ended', handleEnded);
+			video.removeEventListener('play', handlePlay);
+			video.removeEventListener('playing', handlePlaying);
+			video.removeEventListener('pause', handlePause);
+			video.removeEventListener('loadedmetadata', handleLoadedMetadata);
 		};
-	}, [videoRef]);
+	}, []);
 
 	return (
 		<div
@@ -80,7 +103,7 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 				width='100%'
 				height='570'
 				// controls
-				preload='metadata'
+				preload={isInView || hasLoadedMetadata ? 'metadata' : 'none'}
 				playsInline
 			>
 				<source src={`${videoUrl}#t=0.001`} type='video/mp4' />
