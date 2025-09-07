@@ -30,10 +30,11 @@ async function getTestimonials(limit = 10, offset = 0, tags = '') {
 
 export default async function Home() {
 	const queryClient = new QueryClient();
+	const limit = 10;
 
 	await queryClient.prefetchInfiniteQuery({
-		queryKey: ['testimonials', { tags: '' }],
-		queryFn: () => getTestimonials(10, 0, ''),
+		queryKey: ['testimonials', { tags: '', limit }],
+		queryFn: () => getTestimonials(limit, 0, ''),
 		initialPageParam: 0,
 	});
 

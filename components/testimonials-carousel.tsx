@@ -35,36 +35,84 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 
 	const [api, setApi] = React.useState<CarouselApi>();
 	const [currentSlide, setCurrentSlide] = React.useState(0);
+	const currentSlideRef = useRef(0);
+	const isLoadingRef = useRef(false);
 	const loadThreshold = 3; // Load more when within 3 slides of the end
+	const previousLengthRef = useRef(0);
 
 	const allTestimonials = data?.pages.flatMap(page => page.testimonials) || [];
 
-	// Handle carousel slide changes and auto-loading
+	// Initialize carousel API and set up event listeners (stable, no dependencies on data)
 	useEffect(() => {
 		if (!api) return;
 
 		const onSelect = () => {
+			if (isLoadingRef.current) return; // Ignore select events during loading
+
 			const current = api.selectedScrollSnap();
 			setCurrentSlide(current);
+			currentSlideRef.current = current;
 
 			// Check if we're near the end and need to load more
 			const totalSlides = allTestimonials.length;
 			const shouldLoadMore = 
 				hasNextPage && 
 				!isFetchingNextPage && 
+				!isLoadingRef.current &&
 				current >= totalSlides - loadThreshold;
 
 			if (shouldLoadMore) {
+				isLoadingRef.current = true;
 				fetchNextPage();
 			}
 		};
 
 		api.on('select', onSelect);
+		// Set initial position if needed
+		if (api.selectedScrollSnap() !== currentSlideRef.current) {
+			onSelect();
+		}
 
 		return () => {
 			api.off('select', onSelect);
 		};
-	}, [api, allTestimonials.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+	}, [api]); // Only depend on api, not on data
+
+	// Separate effect to handle data changes and position preservation
+	useEffect(() => {
+		if (!api) return;
+		
+		const currentLength = allTestimonials.length;
+		const hadPreviousData = previousLengthRef.current > 0;
+		const hasNewData = currentLength > previousLengthRef.current;
+		
+		if (hasNewData && hadPreviousData && !isFetchingNextPage) {
+			// Data just finished loading, restore position immediately
+			const preservedPosition = currentSlideRef.current;
+			
+			// Use multiple restoration attempts to ensure it sticks
+			const restore = () => {
+				if (api.selectedScrollSnap() !== preservedPosition) {
+					api.scrollTo(preservedPosition, false);
+				}
+			};
+			
+			// Immediate restore
+			restore();
+			
+			// Delayed restore as backup
+			setTimeout(restore, 0);
+			setTimeout(restore, 10);
+			setTimeout(restore, 50);
+			
+			// Reset loading state
+			isLoadingRef.current = false;
+		}
+		
+		// Update previous length
+		previousLengthRef.current = currentLength;
+		
+	}, [allTestimonials.length, api, isFetchingNextPage]);
 
 	if (isLoading) {
 		return (
@@ -149,7 +197,7 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 											<h1 className='text-sm'>
 												{testimonial.title
 													.split('|')
-													.map((item, idx) => (
+													.map((item: string, idx: number) => (
 														<React.Fragment
 															key={`testimonial-title-${testimonial._id}-${idx}`}
 														>

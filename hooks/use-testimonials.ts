@@ -38,7 +38,7 @@ async function fetchTestimonials({
 	return response.json();
 }
 
-export function useTestimonials() {
+export function useTestimonials(limit = 10) {
 	const [tags] = useQueryState(
 		'tags',
 		parseAsArrayOf(
@@ -54,16 +54,16 @@ export function useTestimonials() {
 	const tagsString = tags?.join(',') || '';
 
 	return useInfiniteQuery({
-		queryKey: ['testimonials', { tags: tagsString }],
+		queryKey: ['testimonials', { tags: tagsString, limit }],
 		queryFn: ({ pageParam = 0 }) =>
 			fetchTestimonials({
-				limit: 10,
+				limit,
 				offset: pageParam,
 				tags: tagsString,
 			}),
 		getNextPageParam: (lastPage, allPages) => {
 			if (!lastPage.hasMore) return undefined;
-			return allPages.length * 10;
+			return allPages.length * limit;
 		},
 		initialPageParam: 0,
 		staleTime: 5 * 60 * 1000, // 5 minutes
