@@ -1,15 +1,50 @@
 import { Suspense } from 'react';
+import { QueryClient, dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import TestimonialsCarousel from '@/components/testimonials-carousel';
-import { getTestimonials } from '@/lib/wix';
+
+function getBaseUrl() {
+	if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+		return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+	}
+	return 'http://localhost:3000';
+}
+
+async function getTestimonials(limit = 10, offset = 0, tags = '') {
+	const baseUrl = getBaseUrl();
+	const searchParams = new URLSearchParams({
+		limit: limit.toString(),
+		offset: offset.toString(),
+		...(tags && { tags }),
+	});
+	
+	const response = await fetch(`${baseUrl}/api/testimonials?${searchParams}`, {
+		next: { revalidate: 600 }, // 10 minutes cache
+	});
+	
+	if (!response.ok) {
+		throw new Error('Failed to fetch testimonials');
+	}
+	
+	return response.json();
+}
 
 export default async function Home() {
-	const testimonials = await getTestimonials();
+	const queryClient = new QueryClient();
+
+	await queryClient.prefetchInfiniteQuery({
+		queryKey: ['testimonials', { tags: '' }],
+		queryFn: () => getTestimonials(10, 0, ''),
+		initialPageParam: 0,
+	});
+
 	return (
-		<main className='bg-transparent'>
-			<Suspense fallback={<div>Loading...</div>}>
-				<TestimonialsCarousel testimonials={testimonials} />
-			</Suspense>
-		</main>
+		<HydrationBoundary state={dehydrate(queryClient)}>
+			<main className='bg-transparent'>
+				<Suspense fallback={<div>Loading...</div>}>
+					<TestimonialsCarousel />
+				</Suspense>
+			</main>
+		</HydrationBoundary>
 	);
 }
 

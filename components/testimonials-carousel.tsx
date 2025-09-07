@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
 	Carousel,
 	CarouselContent,
@@ -11,44 +11,95 @@ import {
 import { StarIcon } from 'lucide-react';
 import VideoPlayer from './video-player';
 import { dateFormatter } from '@/lib/utils';
-import { parseAsArrayOf, parseAsStringEnum, useQueryState } from 'nuqs';
+import { useTestimonials } from '@/hooks/use-testimonials';
+import TestimonialSkeleton from './testimonial-skeleton';
+import { type CarouselApi } from '@/components/ui/carousel';
 
 // import Autoplay from 'embla-carousel-autoplay';
 
 interface Props
-	extends React.HTMLAttributes<React.ComponentPropsWithoutRef<'div'>> {
-	testimonials: ReadonlyArray<Testimonial>;
-}
+	extends React.HTMLAttributes<React.ComponentPropsWithoutRef<'div'>> {}
 
 const MAX_RATING = 5;
 
-const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
-	const [tags] = useQueryState(
-		'tags',
-		parseAsArrayOf(
-			parseAsStringEnum<TestimonialTags>([
-				'coliving',
-				'independent',
-				'retreats',
-				'volunteering',
-			])
-		)
-	);
+const TestimonialsCarousel: React.FC<Props> = () => {
+	const { 
+		data, 
+		isLoading, 
+		isError, 
+		error, 
+		fetchNextPage, 
+		hasNextPage, 
+		isFetchingNextPage 
+	} = useTestimonials();
+
+	const [api, setApi] = React.useState<CarouselApi>();
+	const [currentSlide, setCurrentSlide] = React.useState(0);
+	const loadThreshold = 3; // Load more when within 3 slides of the end
+
+	const allTestimonials = data?.pages.flatMap(page => page.testimonials) || [];
+
+	// Handle carousel slide changes and auto-loading
+	useEffect(() => {
+		if (!api) return;
+
+		const onSelect = () => {
+			const current = api.selectedScrollSnap();
+			setCurrentSlide(current);
+
+			// Check if we're near the end and need to load more
+			const totalSlides = allTestimonials.length;
+			const shouldLoadMore = 
+				hasNextPage && 
+				!isFetchingNextPage && 
+				current >= totalSlides - loadThreshold;
+
+			if (shouldLoadMore) {
+				fetchNextPage();
+			}
+		};
+
+		api.on('select', onSelect);
+
+		return () => {
+			api.off('select', onSelect);
+		};
+	}, [api, allTestimonials.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+	if (isLoading) {
+		return (
+			<section className='p-4 bg-transparent'>
+				<div className='bg-transparent'>
+					<div className='items-stretch flex gap-4 overflow-hidden'>
+						{Array.from({ length: 5 }).map((_, idx) => (
+							<div
+								key={idx}
+								className='md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden flex-shrink-0'
+							>
+								<TestimonialSkeleton />
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		);
+	}
+
+	if (isError) {
+		return (
+			<section className='p-4 bg-transparent'>
+				<div className='text-center text-red-500'>
+					Error loading testimonials: {error?.message}
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section className='p-4 bg-transparent'>
-			<Carousel className='bg-transparent'>
+			<Carousel className='bg-transparent' setApi={setApi}>
 				<CarouselContent className='items-stretch'>
-					{testimonials
-						.filter((testimonial) =>
-							tags === null || (tags && tags.length === 0)
-								? true
-								: tags &&
-								  tags.some((tag) =>
-										testimonial.tags?.includes(tag)
-								  )
-						)
-						.map((testimonial, idx) => (
+					{allTestimonials.map((testimonial, idx) => (
 							<CarouselItem
 								key={`${testimonial._id}-${idx}`}
 								className='md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden'
@@ -124,14 +175,24 @@ const TestimonialsCarousel: React.FC<Props> = ({ testimonials }) => {
 										&ldquo;{testimonial.testimonial}&rdquo;
 									</p>
 									<time
-										dateTime={testimonial.date.toDateString()}
+										dateTime={new Date(testimonial.date).toDateString()}
 										className='text-xs text-slate-500'
 									>
-										{dateFormatter(testimonial.date)}
+										{dateFormatter(new Date(testimonial.date))}
 									</time>
 								</div>
 							</CarouselItem>
 						))}
+					{isFetchingNextPage && (
+						Array.from({ length: 2 }).map((_, idx) => (
+							<CarouselItem 
+								key={`loading-${idx}`} 
+								className='md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden'
+							>
+								<TestimonialSkeleton />
+							</CarouselItem>
+						))
+					)}
 				</CarouselContent>
 				<CarouselPrevious className='left-0' />
 				<CarouselNext className='right-0' />

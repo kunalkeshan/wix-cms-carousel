@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import Providers from '@/components/providers';
 
 import './globals.css';
 
@@ -19,7 +20,9 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body className={cn(inter.className, 'bg-transparent')}>
-				<NuqsAdapter>{children}</NuqsAdapter>
+				<NuqsAdapter>
+					<Providers>{children}</Providers>
+				</NuqsAdapter>
 			</body>
 		</html>
 	);
