@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
       .queryDataItems({
         dataCollectionId: process.env.WIX_COLLECTION_ID!,
         consistentRead: true,
+        returnTotalCount: true,
       })
       .ascending("order");
 
