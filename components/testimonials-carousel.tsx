@@ -24,14 +24,14 @@ interface Props
 const MAX_RATING = 5;
 
 const TestimonialsCarousel: React.FC<Props> = () => {
-	const { 
-		data, 
-		isLoading, 
-		isError, 
-		fetchNextPage, 
-		hasNextPage, 
+	const {
+		data,
+		isLoading,
+		isError,
+		fetchNextPage,
+		hasNextPage,
 		isFetchingNextPage,
-		refetch 
+		refetch
 	} = useTestimonials();
 
 	const [api, setApi] = React.useState<CarouselApi>();
@@ -39,6 +39,8 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 	const currentSlideRef = useRef(0);
 	const isLoadingRef = useRef(false);
 	const [showLoadingSkeleton, setShowLoadingSkeleton] = React.useState(false);
+	const [canScrollNext, setCanScrollNext] = React.useState(false);
+	const [canScrollPrev, setCanScrollPrev] = React.useState(false);
 	const loadThreshold = 3; // Load more when within 3 slides of the end (since we have 5 per page)
 	const previousLengthRef = useRef(0);
 
@@ -97,42 +99,64 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 	// Separate effect to handle data changes and position preservation
 	useEffect(() => {
 		if (!api) return;
-		
+
 		const currentLength = allTestimonials.length;
 		const hadPreviousData = previousLengthRef.current > 0;
 		const hasNewData = currentLength > previousLengthRef.current;
-		
+
 		if (hasNewData && hadPreviousData && !isFetchingNextPage) {
 			// Data just finished loading, restore position immediately
 			const preservedPosition = currentSlideRef.current;
-			
+
 			// Reinitialize carousel to recognize new slides
 			api.reInit();
-			
+
 			// Use multiple restoration attempts to ensure it sticks
 			const restore = () => {
 				if (api.selectedScrollSnap() !== preservedPosition) {
 					api.scrollTo(preservedPosition, false);
 				}
 			};
-			
+
 			// Immediate restore
 			restore();
-			
+
 			// Delayed restore as backup
 			setTimeout(restore, 0);
 			setTimeout(restore, 10);
 			setTimeout(restore, 50);
-			
+
 			// Reset loading state
 			isLoadingRef.current = false;
 			setShowLoadingSkeleton(false);
 		}
-		
+
 		// Update previous length
 		previousLengthRef.current = currentLength;
-		
+
 	}, [allTestimonials.length, api, isFetchingNextPage]);
+
+	// Monitor carousel scroll state and combine with hasNextPage
+	useEffect(() => {
+		if (!api) return;
+
+		const updateScrollState = () => {
+			const emblaCanScrollNext = api.canScrollNext();
+			const shouldEnableNext = emblaCanScrollNext || hasNextPage;
+
+			setCanScrollPrev(api.canScrollPrev());
+			setCanScrollNext(shouldEnableNext);
+		};
+
+		updateScrollState();
+		api.on('select', updateScrollState);
+		api.on('reInit', updateScrollState);
+
+		return () => {
+			api.off('select', updateScrollState);
+			api.off('reInit', updateScrollState);
+		};
+	}, [api, hasNextPage, allTestimonials.length]);
 
 	if (isLoading) {
 		return (
@@ -272,8 +296,8 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 						))
 					)}
 				</CarouselContent>
-				<CarouselPrevious className='left-0' />
-				<CarouselNext className='right-0' />
+				<CarouselPrevious className='left-0' disabled={!canScrollPrev} />
+				<CarouselNext className='right-0' disabled={!canScrollNext} />
 			</Carousel>
 		</section>
 	);
