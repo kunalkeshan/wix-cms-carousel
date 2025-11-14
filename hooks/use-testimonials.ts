@@ -47,6 +47,10 @@ export function useTestimonials(limit = 5) {
 				'independent',
 				'retreats',
 				'volunteering',
+				'films',
+				'music',
+				'camping',
+				'worldschooling',
 			])
 		)
 	);
