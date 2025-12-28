@@ -54,7 +54,7 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 		return () => {
 			observer.unobserve(video);
 		};
-	}, [hasLoadedMetadata]);
+	}, []);
 
 	// Pause all other videos when this video is playing
 	usePauseAllVideos(videoRef.current);
@@ -90,16 +90,24 @@ const VideoPlayer: React.FC<Props> = ({ videoUrl, className, ...props }) => {
 	return (
 		<div
 			role='button'
-			className='relative aspect-[9_/_16] rounded-t-lg overflow-hidden bg-gradient-to-b from-transparent to-black'
+			tabIndex={0}
+			className='relative aspect-[9_/_16] rounded-t-lg overflow-hidden bg-gradient-to-b from-transparent to-black cursor-pointer'
 			onClick={() => {
 				const control = playing ? 'pause' : 'play';
 				handleTogglePlay(control);
+			}}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					const control = playing ? 'pause' : 'play';
+					handleTogglePlay(control);
+				}
 			}}
 		>
 			<video
 				ref={videoRef}
 				{...props}
-				className={cn('w-full h-auto', className)}
+				className={cn('w-full h-auto pointer-events-none', className)}
 				width='100%'
 				height='570'
 				// controls
