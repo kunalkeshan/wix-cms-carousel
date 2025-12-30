@@ -207,7 +207,7 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 									<VideoPlayer
 										videoUrl={testimonial.videoUrl}
 									/>
-									<div className='absolute bottom-4 left-0 px-4'>
+									<div className='absolute bottom-4 left-0 px-4 pointer-events-none'>
 										<div className='flex gap-1 items-center'>
 											{Array(testimonial.rating)
 												.fill(0)
