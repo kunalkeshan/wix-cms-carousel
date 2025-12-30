@@ -38,7 +38,6 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 	const [currentSlide, setCurrentSlide] = React.useState(0);
 	const currentSlideRef = useRef(0);
 	const isLoadingRef = useRef(false);
-	const [showLoadingSkeleton, setShowLoadingSkeleton] = React.useState(false);
 	const [canScrollNext, setCanScrollNext] = React.useState(false);
 	const [canScrollPrev, setCanScrollPrev] = React.useState(false);
 	const loadThreshold = 3; // Load more when within 3 slides of the end (since we have 5 per page)
@@ -80,7 +79,6 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 
 			if (shouldLoadMore) {
 				isLoadingRef.current = true;
-				setShowLoadingSkeleton(true); // Show skeleton only when user navigates to trigger loading
 				fetchNextPageRef.current();
 			}
 		};
@@ -128,7 +126,6 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 
 			// Reset loading state
 			isLoadingRef.current = false;
-			setShowLoadingSkeleton(false);
 		}
 
 		// Update previous length
@@ -285,16 +282,6 @@ const TestimonialsCarousel: React.FC<Props> = () => {
 								</div>
 							</CarouselItem>
 						))}
-					{showLoadingSkeleton && hasNextPage && (
-						Array.from({ length: 2 }).map((_, idx) => (
-							<CarouselItem 
-								key={`loading-${idx}`} 
-								className='md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5 min-h-full rounded-lg overflow-hidden'
-							>
-								<TestimonialSkeleton />
-							</CarouselItem>
-						))
-					)}
 				</CarouselContent>
 				<CarouselPrevious className='left-0' disabled={!canScrollPrev} />
 				<CarouselNext className='right-0' disabled={!canScrollNext} />
